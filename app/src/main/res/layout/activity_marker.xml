@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.alerther.alerther.MarkerActivity">
+
+    <!--<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+
+        <!--<TableRow-->
+            <!--android:id="@+id/tableRow0"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="20dp">-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_column="1"-->
+                <!--android:text="Incident Date" />-->
+
+            <TextView
+                android:id="@+id/incidentdate"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/place_autocomplete_prediction_primary_text"
+                android:onClick="incidentdateClick"
+                android:clickable="true"
+                android:layout_span="2"
+                android:layout_column="0"
+                android:height="60dp"
+                android:textSize="20dp"
+                android:textIsSelectable="false" />
+
+        <!--</TableRow>-->
+
+        <!--<TableRow-->
+            <!--android:id="@+id/tableRow1"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="20dp">-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_column="1"-->
+                <!--android:text="Incident Time" />-->
+
+            <TextView
+                android:id="@+id/incidenttime"
+                android:clickable="true"
+                android:onClick="incidenttimeClick"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:height="60dp"
+                android:textSize="20dp" />
+
+        <!--</TableRow>-->
+
+
+        <!--<TableRow-->
+            <!--android:id="@+id/tableRow2"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="20dp">-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_column="1"-->
+                <!--android:text="Incident" />-->
+
+            <EditText
+                android:id="@+id/incident"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:editable="true"
+                android:elegantTextHeight="true"
+                android:enabled="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:lines="5"
+                android:hint="Add description here.."
+                android:linksClickable="true" />
+        <!--</TableRow>-->
+
+        <!--<TableRow-->
+            <!--android:id="@+id/tableRow3"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="20dp">-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_column="1"-->
+                <!--android:text="Tips" />-->
+
+            <EditText
+                android:id="@+id/tips"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Add tips here.."
+                android:lines="5"
+                android:linksClickable="true" />
+        <!--</TableRow>-->
+        <!--<TableRow-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onSubmitClick"
+                android:text="Submit" />
+        <!--</TableRow>-->
+
+    <!--</TableLayout>-->
+</LinearLayout>
