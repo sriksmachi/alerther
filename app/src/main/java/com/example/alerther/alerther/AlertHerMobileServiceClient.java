@@ -1,6 +1,7 @@
 package com.example.alerther.alerther;
 
 import android.text.Html;
+import android.util.Log;
 
 import com.google.android.gms.plus.internal.model.people.PersonEntity;
 import com.google.common.reflect.TypeToken;
@@ -104,6 +105,8 @@ public class AlertHerMobileServiceClient {
             wr.flush();
             wr.close();
             int responseCode = urlRequest.getResponseCode();
+            String responseString = Integer.toString(responseCode);
+            Log.d("POST RESPONSE", responseString);
         } catch (Exception e) {
             e.printStackTrace();
         }

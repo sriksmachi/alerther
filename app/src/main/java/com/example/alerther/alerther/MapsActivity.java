@@ -1,5 +1,7 @@
 package com.example.alerther.alerther;
 
+import android.*;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -14,9 +16,19 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,7 +43,8 @@ import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleApiClient.OnConnectionFailedListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private GoogleMap mMap;
     MobileServiceClient mClient;
@@ -50,6 +63,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         mProgressBar = (ProgressBar) findViewById(R.id.loadingProgressBar);
         mProgressBar.setVisibility(ProgressBar.GONE);
+        Intent usernameIntent = getIntent();
+        String username = usernameIntent.getStringExtra("Username");
+        TextView signedInAs = (TextView) findViewById(R.id.signedInAs);
+        if (username == "" || username == null) {
+            Intent signInIntent = new Intent(this, SignInActivity.class);
+            startActivity(signInIntent);
+        }
+        signedInAs.setText("Signed in as: " + username);
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d("Google Maps", "onConnectionFailed:" + connectionResult);
     }
 
     @Override
@@ -58,11 +86,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         try {
             /////----------------------------------Zooming camera to position user-----------------
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},11);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mMap.setMyLocationEnabled(true);
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                String provider = locationManager.getBestProvider(criteria, true);
+                if (ActivityCompat.checkSelfPermission(MapsActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                Location myLocation = locationManager.getLastKnownLocation(provider);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(myLocation.getLatitude(), myLocation.getLongitude())));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             }
             /////----------------------------------Zooming camera to position user-----------------
         } catch (Exception e) {
@@ -83,8 +119,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         ) {
                                     IncidentItem item = incidentItem.next();
                                     LatLng latlng = new LatLng(item.mLatitude, item.mLongitude);
-                                    mMap.addMarker(new MarkerOptions().position(latlng).title(item.mDescription).snippet(item.mTips));
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                                    mMap.addMarker(new MarkerOptions().position(latlng).title(item.mDescription).snippet(item.mTips + "\n" + item.mReportedTime));
+                                   // mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
                                 }
                             }
                         });
@@ -110,6 +146,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 11) {
+            if (permissions.length == 1 &&
+                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                mMap.setMyLocationEnabled(true);
+                // Get LocationManager object from System Service LOCATION_SERVICE
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                String provider = locationManager.getBestProvider(criteria, true);
+                if (ActivityCompat.checkSelfPermission(MapsActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                Location myLocation = locationManager.getLastKnownLocation(provider);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(myLocation.getLatitude(), myLocation.getLongitude())));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+
+            } else {
+                // Permission was denied. Display an error message.
+            }
+        }
+    }
+
     private void createAndShowDialog(Exception exception, String title) {
         createAndShowDialog(exception.toString(), title);
     }
@@ -129,9 +202,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void showTimePickerDialog(View v) {
-//        DialogFragment newFragment = new DatePickerFragment();
-//        newFragment.show(getFragmentManager(), "datePicker");
+    public void signOut(View view) {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Intent signInActivity = new Intent(MapsActivity.this, SignInActivity.class);
+                        startActivity(signInActivity);
+                    }
+                });
     }
-
 }

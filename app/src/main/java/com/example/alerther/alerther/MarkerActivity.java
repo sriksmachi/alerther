@@ -87,17 +87,25 @@ public class MarkerActivity extends AppCompatActivity {
 
     public void onSubmitClick(View v){
         double latitude = latLng.latitude;
+        double longitude = latLng.longitude;
         EditText incidentView = (EditText)findViewById(R.id.incident);
         Editable incident = incidentView.getText();
 
         EditText tipsView = (EditText)findViewById(R.id.tips);
         Editable tips = tipsView.getText();
 
+        TextView incidentDate = (TextView)findViewById(R.id.incidentdate);
+        TextView incidentTime = (TextView)findViewById(R.id.incidenttime);
+
         final IncidentItem incidentItem = new IncidentItem();
-        incidentItem.mCreatedDate = new java.util.Date();
-        incidentItem.mDescription = "Android Description";
-        incidentItem.mTips = "Android Tips";
-        incidentItem.mReportedTime = new java.util.Date();
+        incidentItem.mLatitude = latitude;
+        incidentItem.mLongitude = longitude;
+//        incidentItem.mCreatedDate = new java.util.Date();
+        incidentItem.mDescription = incident.toString();
+        incidentItem.mTips = tips.toString();
+//        incidentItem.mReportedTime = new java.util.Date();
+        incidentItem.mReportedTime = "2016-02-24T16:16:28.978Z";
+        incidentItem.mCreatedDate = "2016-02-24T16:16:28.978Z";
         incidentItem.mUserName = "android";
         incidentItem.mid = java.util.UUID.randomUUID().toString();
 
@@ -108,6 +116,14 @@ public class MarkerActivity extends AppCompatActivity {
                     try {
                         AlertHerMobileServiceClient client = new AlertHerMobileServiceClient();
                         client.PostIncident(incidentItem);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(MarkerActivity.this
+                                        , MapsActivity.class);
+                                startActivity(intent);
+                            }
+                        });
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -119,9 +135,7 @@ public class MarkerActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
-        Intent intent = new Intent(MarkerActivity.this
-                , MapsActivity.class);
-        startActivity(intent);
+
     }
 
     private AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {

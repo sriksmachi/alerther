@@ -30,4 +30,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.2'
     compile 'com.google.guava:guava:18.0'
     compile 'com.microsoft.azure:azure-mobile-services-android-sdk:2.0.3'
+    apply plugin: 'com.google.gms.google-services'
 }
